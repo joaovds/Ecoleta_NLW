@@ -31,26 +31,30 @@ class PointController {
   }
 
   async index(req: Request, res: Response) {
-    const { city, uf, items } = req.query;
+    try {
+      const { city, uf, items } = req.query;
 
-    const parsedItems = String(items)
-      .split(',')
-      .map((item) => Number(item.trim()));
+      const parsedItems = String(items)
+        .split(',')
+        .map((item) => Number(item.trim()));
 
-    const points = await knex('tb_points')
-      .join(
-        'tb_points_items',
-        'tb_points.cd_points',
-        '=',
-        'tb_points_items.id_points'
-      )
-      .whereIn('tb_points_items.id_items', parsedItems)
-      .where('city', String(city))
-      .where('uf', String(uf))
-      .distinct()
-      .select('tb_points.*');
+      const points = await knex('tb_points')
+        .join(
+          'tb_points_items',
+          'tb_points.cd_points',
+          '=',
+          'tb_points_items.id_points'
+        )
+        .whereIn('tb_points_items.id_items', parsedItems)
+        .where('city', String(city))
+        .where('uf', String(uf))
+        .distinct()
+        .select('tb_points.*');
 
-    return res.send(points);
+      return res.send(points);
+    } catch (error) {
+      return res.send(error);
+    }
   }
 
   async create(req: Request, res: Response) {
