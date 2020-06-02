@@ -10,7 +10,18 @@ class PointController {
     if (!point) {
       return res.status(400).json({ message: 'Point not found.' });
     }
-    return res.json(point);
+
+    const items = await knex('tb_items')
+      .join(
+        'tb_points_items',
+        'tb_items.cd_items',
+        '=',
+        'tb_points_items.id_items'
+      )
+      .where('tb_points_items.id_points', cd_points)
+      .select('tb_items.title');
+
+    return res.json({ point, items });
   }
 
   async create(req: Request, res: Response) {
