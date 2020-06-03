@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
 import { Link } from 'react-router-dom';
@@ -101,12 +101,12 @@ const CreatePoint = () => {
 
     setSelectedCity(city);
   }
-  function handleMapClick(event: LeafletMouseEvent) {
-    setSelectedPosition([event.latlng.lat, event.latlng.lng]);
+  function handleMapClick(e: LeafletMouseEvent) {
+    setSelectedPosition([e.latlng.lat, e.latlng.lng]);
   }
 
-  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    const { name, value } = event.target;
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
 
     setInputData({ ...inputData, [name]: value });
   }
@@ -122,6 +122,30 @@ const CreatePoint = () => {
       setSelectedItem([...selectedItem, cd_item]);
     }
   }
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    const { name, email, whatsapp } = inputData;
+    const uf = selectedUf;
+    const city = selectedCity;
+    const [latitude, longitude] = selectedPosition;
+    const items = selectedItem;
+
+    const data = {
+      name,
+      email,
+      whatsapp,
+      uf,
+      city,
+      latitude,
+      longitude,
+      items,
+    };
+
+    await api.post('points', data);
+
+    alert('Ponto de coleta criado!');
+  }
 
   return (
     <div id='page-create-point'>
@@ -134,7 +158,7 @@ const CreatePoint = () => {
         </Link>
       </header>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <h1>
           Cadastro do <br /> ponto de coleta
         </h1>
