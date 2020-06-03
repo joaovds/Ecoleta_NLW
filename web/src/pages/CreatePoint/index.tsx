@@ -26,6 +26,7 @@ interface IIBGECITYResponse {
 
 const CreatePoint = () => {
   const [items, setItems] = useState<Iitem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<number[]>([]);
 
   const [initialPosition, setInitialPosition] = useState<[number, number]>([
     0,
@@ -108,6 +109,18 @@ const CreatePoint = () => {
     const { name, value } = event.target;
 
     setInputData({ ...inputData, [name]: value });
+  }
+  function handleSelectItem(cd_item: number) {
+    const verificationSelected = selectedItem.findIndex(
+      (item) => item === cd_item
+    );
+
+    if (verificationSelected >= 0) {
+      const filteredItems = selectedItem.filter((item) => item !== cd_item);
+      setSelectedItem(filteredItems);
+    } else {
+      setSelectedItem([...selectedItem, cd_item]);
+    }
   }
 
   return (
@@ -225,7 +238,13 @@ const CreatePoint = () => {
 
           <ul className='items-grid'>
             {items.map((item) => (
-              <li key={item.cd_item}>
+              <li
+                key={item.cd_item}
+                onClick={() => handleSelectItem(item.cd_item)}
+                className={
+                  selectedItem.includes(item.cd_item) ? 'selected' : ''
+                }
+              >
                 <img src={item.image_url} alt={item.title} />
                 <span>{item.title}</span>
               </li>
