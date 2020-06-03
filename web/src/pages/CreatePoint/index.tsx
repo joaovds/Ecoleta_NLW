@@ -32,6 +32,12 @@ const CreatePoint = () => {
     0,
   ]);
 
+  const [inputData, setInputData] = useState({
+    name: '',
+    email: '',
+    whatsapp: '',
+  });
+
   const [ufs, setUfs] = useState<string[]>([]);
   const [selectedUf, setSelectedUf] = useState('0');
   const [selectedCity, setSelectedCity] = useState('0');
@@ -98,6 +104,12 @@ const CreatePoint = () => {
     setSelectedPosition([event.latlng.lat, event.latlng.lng]);
   }
 
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = event.target;
+
+    setInputData({ ...inputData, [name]: value });
+  }
+
   return (
     <div id='page-create-point'>
       <header>
@@ -121,17 +133,32 @@ const CreatePoint = () => {
 
           <div className='field'>
             <label htmlFor='name'>Nome da entidade</label>
-            <input type='text' name='name' id='name' />
+            <input
+              type='text'
+              name='name'
+              id='name'
+              onChange={handleInputChange}
+            />
           </div>
 
           <div className='field-group'>
             <div className='field'>
               <label htmlFor='email'>E-mail</label>
-              <input type='email' name='email' id='email' />
+              <input
+                type='email'
+                name='email'
+                id='email'
+                onChange={handleInputChange}
+              />
             </div>
             <div className='field'>
               <label htmlFor='name'>Whatsapp</label>
-              <input type='text' name='whatsapp' id='whatsapp' />
+              <input
+                type='text'
+                name='whatsapp'
+                id='whatsapp'
+                onChange={handleInputChange}
+              />
             </div>
           </div>
         </fieldset>
