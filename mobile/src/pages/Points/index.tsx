@@ -4,19 +4,25 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
+  Image,
   ScrollView,
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useNavigation } from '@react-navigation/native';
 
-import Map from 'react-native-maps';
+import Map, { Marker } from 'react-native-maps';
 import { SvgUri } from 'react-native-svg';
 
 const Points = () => {
   const navigation = useNavigation();
+
   function handleNavigateBack() {
     navigation.goBack();
+  }
+
+  function handleNavigateToDetail() {
+    navigation.navigate('Detail');
   }
 
   return (
@@ -32,7 +38,31 @@ const Points = () => {
         </Text>
 
         <View style={styles.mapContainer}>
-          <Map style={styles.map} />
+          <Map
+            style={styles.map}
+            initialRegion={{
+              latitude: -24.329752,
+              longitude: -47.0158125,
+              latitudeDelta: 0.014,
+              longitudeDelta: 0.014,
+            }}
+          >
+            <Marker
+              coordinate={{ latitude: -24.329752, longitude: -47.0158125 }}
+              onPress={handleNavigateToDetail}
+            >
+              <View style={styles.mapMarkerContainer}>
+                <Image
+                  style={styles.mapMarkerImage}
+                  source={{
+                    uri:
+                      'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
+                  }}
+                />
+                <Text style={styles.mapMarkerTitle}>Mercadin</Text>
+              </View>
+            </Marker>
+          </Map>
         </View>
       </View>
 
@@ -46,7 +76,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
@@ -55,7 +85,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
@@ -64,7 +94,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
@@ -73,7 +103,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
@@ -82,7 +112,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
@@ -91,7 +121,7 @@ const Points = () => {
             <SvgUri
               width={42}
               height={42}
-              uri='http://192.168.0.115:3333/uploads/lampadas.svg'
+              uri='http://192.168.0.106:3333/uploads/lampadas.svg'
             />
             <Text style={styles.itemTitle}>Lâmpadas</Text>
           </TouchableOpacity>
