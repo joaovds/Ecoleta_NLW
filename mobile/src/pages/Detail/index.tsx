@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,22 +9,57 @@ import {
 } from 'react-native';
 import { Feather as Icon, FontAwesome } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import * as MailComposer from 'expo-mail-composer';
 
 import { RectButton } from 'react-native-gesture-handler';
+import api from '../../services/api';
 
 interface Iparams {
   cd_point: number;
 }
 
+interface Idata {
+  point: {
+    image: string;
+    name: string;
+    email: string;
+    whatsapp: string;
+    city: string;
+    uf: string;
+  };
+  items: {
+    title: string;
+  }[];
+}
+
 const Detail = () => {
+  const [data, setData] = useState<Idata>({} as Idata);
+
   const navigation = useNavigation();
 
   const route = useRoute();
 
   const routeParams = route.params as Iparams;
 
+  useEffect(() => {
+    api.get(`points/${routeParams.cd_point}`).then((res) => {
+      setData(res.data);
+    });
+  }, []);
+
   function handleNavigateBack() {
     navigation.goBack();
+  }
+
+  function handleMail() {
+    MailComposer.composeAsync({
+      subject: 'Interesse na coleta de resíduos',
+      recipients: [data.point.email],
+    });
+  }
+
+  if (!data.point) {
+    return null;
   }
 
   return (
@@ -37,17 +72,20 @@ const Detail = () => {
         <Image
           style={styles.pointImage}
           source={{
-            uri:
-              'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
+            uri: data.point.image,
           }}
         />
 
-        <Text style={styles.pointName}>Mercadin</Text>
-        <Text style={styles.pointItems}>Lampâdas, Papel e Papelão</Text>
+        <Text style={styles.pointName}>{data.point.name}</Text>
+        <Text style={styles.pointItems}>
+          {data.items.map((item) => item.title).join(', ')}
+        </Text>
 
         <View style={styles.address}>
           <Text style={styles.addressTitle}>Endereço</Text>
-          <Text style={styles.addressContent}>Peruíbe, SP</Text>
+          <Text style={styles.addressContent}>
+            {data.point.city}, {data.point.uf}
+          </Text>
         </View>
       </View>
 
@@ -57,7 +95,7 @@ const Detail = () => {
           <Text style={styles.buttonText}>Whatsapp</Text>
         </RectButton>
 
-        <RectButton style={styles.button} onPress={() => {}}>
+        <RectButton style={styles.button} onPress={handleMail}>
           <Icon name='mail' size={20} color='#FFF' />
           <Text style={styles.buttonText}>E-mail</Text>
         </RectButton>
