@@ -24,9 +24,18 @@ interface Iitem {
   title: string;
 }
 
+interface Ipoints {
+  cd_points: number;
+  name: string;
+  image: string;
+  latitude: number;
+  longitude: number;
+}
+
 const Points = () => {
   const [items, setItems] = useState<Iitem[]>([]);
   const [selectedItem, setSelectedItem] = useState<number[]>([]);
+  const [points, setPoints] = useState<Ipoints[]>([]);
 
   const [initialPosition, setInitialPosition] = useState<[number, number]>([
     0,
@@ -62,12 +71,26 @@ const Points = () => {
     loadPosition();
   }, []);
 
+  useEffect(() => {
+    api
+      .get('points', {
+        params: {
+          city: 'Peruíbe',
+          uf: 'SP',
+          items: [2, 3, 6],
+        },
+      })
+      .then((res) => {
+        setPoints(res.data);
+      });
+  }, []);
+
   function handleNavigateBack() {
     navigation.goBack();
   }
 
-  function handleNavigateToDetail() {
-    navigation.navigate('Detail');
+  function handleNavigateToDetail(cd_points: number) {
+    navigation.navigate('Detail', { cd_point: cd_points });
   }
 
   function handleSelectItem(cd_item: number) {
@@ -106,21 +129,26 @@ const Points = () => {
                 longitudeDelta: 0.014,
               }}
             >
-              <Marker
-                coordinate={{ latitude: -24.329752, longitude: -47.0158125 }}
-                onPress={handleNavigateToDetail}
-              >
-                <View style={styles.mapMarkerContainer}>
-                  <Image
-                    style={styles.mapMarkerImage}
-                    source={{
-                      uri:
-                        'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
-                    }}
-                  />
-                  <Text style={styles.mapMarkerTitle}>Mercadin</Text>
-                </View>
-              </Marker>
+              {points.map((point) => (
+                <Marker
+                  key={String(point.cd_points)}
+                  coordinate={{
+                    latitude: point.latitude,
+                    longitude: point.longitude,
+                  }}
+                  onPress={() => handleNavigateToDetail(point.cd_points)}
+                >
+                  <View style={styles.mapMarkerContainer}>
+                    <Image
+                      style={styles.mapMarkerImage}
+                      source={{
+                        uri: point.image,
+                      }}
+                    />
+                    <Text style={styles.mapMarkerTitle}>{point.name}</Text>
+                  </View>
+                </Marker>
+              ))}
             </Map>
           )}
         </View>
