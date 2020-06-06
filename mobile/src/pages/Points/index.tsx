@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons';
 import Constants from 'expo-constants';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Map, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -32,6 +32,11 @@ interface Ipoints {
   longitude: number;
 }
 
+interface Iparams {
+  uf: string;
+  city: string;
+}
+
 const Points = () => {
   const [items, setItems] = useState<Iitem[]>([]);
   const [selectedItem, setSelectedItem] = useState<number[]>([]);
@@ -43,6 +48,9 @@ const Points = () => {
   ]);
 
   const navigation = useNavigation();
+  const route = useRoute();
+
+  const routeParams = route.params as Iparams;
 
   useEffect(() => {
     api.get('items').then((res) => {
@@ -75,15 +83,15 @@ const Points = () => {
     api
       .get('points', {
         params: {
-          city: 'Peruíbe',
-          uf: 'SP',
-          items: [2, 3, 6],
+          city: routeParams.city,
+          uf: routeParams.uf,
+          items: selectedItem,
         },
       })
       .then((res) => {
         setPoints(res.data);
       });
-  }, []);
+  }, [selectedItem]);
 
   function handleNavigateBack() {
     navigation.goBack();
