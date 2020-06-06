@@ -6,12 +6,14 @@ import {
   Text,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Feather as Icon } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useNavigation } from '@react-navigation/native';
 
 import Map, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 import { SvgUri } from 'react-native-svg';
 
 import api from '../../services/api';
@@ -26,13 +28,38 @@ const Points = () => {
   const [items, setItems] = useState<Iitem[]>([]);
   const [selectedItem, setSelectedItem] = useState<number[]>([]);
 
+  const [initialPosition, setInitialPosition] = useState<[number, number]>([
+    0,
+    0,
+  ]);
+
   const navigation = useNavigation();
 
   useEffect(() => {
     api.get('items').then((res) => {
       setItems(res.data);
-      console.log(res.data);
     });
+  }, []);
+
+  useEffect(() => {
+    async function loadPosition() {
+      const { status } = await Location.requestPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert(
+          'Localização negada!',
+          'Precisamos que você permita obtermos sua localização!'
+        );
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync();
+
+      const { latitude, longitude } = location.coords;
+
+      setInitialPosition([latitude, longitude]);
+    }
+    loadPosition();
   }, []);
 
   function handleNavigateBack() {
@@ -69,31 +96,33 @@ const Points = () => {
         </Text>
 
         <View style={styles.mapContainer}>
-          <Map
-            style={styles.map}
-            initialRegion={{
-              latitude: -24.329752,
-              longitude: -47.0158125,
-              latitudeDelta: 0.014,
-              longitudeDelta: 0.014,
-            }}
-          >
-            <Marker
-              coordinate={{ latitude: -24.329752, longitude: -47.0158125 }}
-              onPress={handleNavigateToDetail}
+          {initialPosition[0] !== 0 && (
+            <Map
+              style={styles.map}
+              initialRegion={{
+                latitude: initialPosition[0],
+                longitude: initialPosition[1],
+                latitudeDelta: 0.014,
+                longitudeDelta: 0.014,
+              }}
             >
-              <View style={styles.mapMarkerContainer}>
-                <Image
-                  style={styles.mapMarkerImage}
-                  source={{
-                    uri:
-                      'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
-                  }}
-                />
-                <Text style={styles.mapMarkerTitle}>Mercadin</Text>
-              </View>
-            </Marker>
-          </Map>
+              <Marker
+                coordinate={{ latitude: -24.329752, longitude: -47.0158125 }}
+                onPress={handleNavigateToDetail}
+              >
+                <View style={styles.mapMarkerContainer}>
+                  <Image
+                    style={styles.mapMarkerImage}
+                    source={{
+                      uri:
+                        'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
+                    }}
+                  />
+                  <Text style={styles.mapMarkerTitle}>Mercadin</Text>
+                </View>
+              </Marker>
+            </Map>
+          )}
         </View>
       </View>
 
