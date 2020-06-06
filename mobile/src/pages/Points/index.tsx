@@ -24,6 +24,7 @@ interface Iitem {
 
 const Points = () => {
   const [items, setItems] = useState<Iitem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<number[]>([]);
 
   const navigation = useNavigation();
 
@@ -40,6 +41,19 @@ const Points = () => {
 
   function handleNavigateToDetail() {
     navigation.navigate('Detail');
+  }
+
+  function handleSelectItem(cd_item: number) {
+    const verificationSelected = selectedItem.findIndex(
+      (item) => item === cd_item
+    );
+
+    if (verificationSelected >= 0) {
+      const filteredItems = selectedItem.filter((item) => item !== cd_item);
+      setSelectedItem(filteredItems);
+    } else {
+      setSelectedItem([...selectedItem, cd_item]);
+    }
   }
 
   return (
@@ -92,8 +106,12 @@ const Points = () => {
           {items.map((item) => (
             <TouchableOpacity
               key={String(item.cd_item)}
-              style={styles.item}
-              onPress={() => {}}
+              style={[
+                styles.item,
+                selectedItem.includes(item.cd_item) ? styles.selectedItem : {},
+              ]}
+              onPress={() => handleSelectItem(item.cd_item)}
+              activeOpacity={0.6}
             >
               <SvgUri width={42} height={42} uri={item.image_url} />
               <Text style={styles.itemTitle}>{item.title}</Text>
