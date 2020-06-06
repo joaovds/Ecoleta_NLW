@@ -14,6 +14,11 @@ class PointController {
         return res.status(400).json({ message: 'Point not found.' });
       }
 
+      const serializedPoint = {
+        ...point,
+        image_url: `http://192.168.0.106:3333/uploads/${point.image}`,
+      };
+
       const items = await knex('tb_items')
         .join(
           'tb_points_items',
@@ -24,7 +29,7 @@ class PointController {
         .where('tb_points_items.id_points', cd_points)
         .select('tb_items.title');
 
-      return res.json({ point, items });
+      return res.json({ point: serializedPoint, items });
     } catch (error) {
       return res.send(error);
     }
@@ -51,7 +56,14 @@ class PointController {
         .distinct()
         .select('tb_points.*');
 
-      return res.send(points);
+      const serializedPoints = points.map((point) => {
+        return {
+          ...point,
+          image_url: `http://192.168.0.106:3333/uploads/${point.image}`,
+        };
+      });
+
+      return res.json(serializedPoints);
     } catch (error) {
       return res.send(error);
     }
@@ -73,8 +85,7 @@ class PointController {
       const trx = await knex.transaction();
 
       const point = {
-        image:
-          'https://f.i.uol.com.br/fotografia/2020/05/19/15899108995ec41d73e3bdd_1589910899_3x2_lg.jpg',
+        image: req.file.filename,
         name,
         email,
         whatsapp,
@@ -86,12 +97,15 @@ class PointController {
 
       const insertPoints = await trx('tb_points').insert(point);
 
-      const pointItems = items.map((id_items: Number) => {
-        return {
-          id_points: insertPoints[0],
-          id_items,
-        };
-      });
+      const pointItems = items
+        .split(',')
+        .map((item: string) => Number(item.trim()))
+        .map((id_items: Number) => {
+          return {
+            id_points: insertPoints[0],
+            id_items,
+          };
+        });
 
       await trx('tb_points_items').insert(pointItems);
 
